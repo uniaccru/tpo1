@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="s368856@se.ifmo.ru:2222" type="ssh/sftp" uuid="19b556e3-ec71-473a-9c04-58654150a3df">
+        <config>
+          <option name="projectRootOnTarget" value="/home/studs/s368856/tpo1" />
+          <option name="serverName" value="s368856@se.ifmo.ru:2222 agent" />
+          <option name="useRsync" value="true" />
+        </config>
+        <ContributedStateBase type="JavaLanguageRuntime">
+          <config>
+            <option name="homePath" value="/usr/local/openjdk17" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>
