@@ -28,13 +28,20 @@ public class BinarySunriseEvent {
         this.atmosphereState = AtmosphereState.RAREFIED;
     }
 
+    private void requireIlluminationState(IlluminationState expected, String message) {
+        if (this.illuminationState != expected) {
+            throw new IllegalStateException(message);
+        }
+    }
+
     /**
      * "В полной темноте сверкнула ослепительно яркая точка света."
      */
     public void flashPointOfLight() {
-        if (this.illuminationState != IlluminationState.TOTAL_DARKNESS) {
-            throw new IllegalStateException("Точка света может сверкнуть только из полной темноты.");
-        }
+        requireIlluminationState(
+                IlluminationState.TOTAL_DARKNESS,
+                "Точка света может сверкнуть только из полной темноты."
+        );
         this.illuminationState = IlluminationState.BRIGHT_POINT;
     }
 
@@ -42,9 +49,10 @@ public class BinarySunriseEvent {
      * "Она начала расползаться в стороны, превращаясь в узкий полумесяц..."
      */
     public void expandIntoCrescent() {
-        if (this.illuminationState != IlluminationState.BRIGHT_POINT) {
-            throw new IllegalStateException("В полумесяц может превратиться только яркая точка.");
-        }
+        requireIlluminationState(
+                IlluminationState.BRIGHT_POINT,
+                "В полумесяц может превратиться только яркая точка."
+        );
         this.illuminationState = IlluminationState.NARROW_CRESCENT;
     }
 
@@ -54,9 +62,10 @@ public class BinarySunriseEvent {
      * струились сквозь разреженную атмосферу."
      */
     public void revealSuns() {
-        if (this.illuminationState != IlluminationState.NARROW_CRESCENT) {
-            throw new IllegalStateException("Солнца могут появиться только после фазы узкого полумесяца.");
-        }
+        requireIlluminationState(
+                IlluminationState.NARROW_CRESCENT,
+                "Солнца могут появиться только после фазы узкого полумесяца."
+        );
         this.illuminationState = IlluminationState.TWO_SUNS;
         this.horizonState = HorizonState.BURNING_WHITE_FLAME;
         this.atmosphereState = AtmosphereState.COLORFUL_FLASHES;

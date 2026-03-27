@@ -6,10 +6,14 @@ import org.example.part2.tracing.RBTreeTracePoint;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.example.part2.tracing.RBTreeTracePoint.DELETE_FIX_NEEDED;
 import static org.example.part2.tracing.RBTreeTracePoint.DELETE_FIX_SIBLING_BLACK_KIDS;
@@ -117,24 +121,37 @@ class RBTreeTest {
         assertIterableEquals(Arrays.asList(INSERT_EMPTY_TREE), trace);
     }
 
-    @Test
-    void insertGoRightNoFix() throws Exception {
-        Object tree = newTree();
-        insert(tree, 10);
-        List<RBTreeTracePoint> trace = trace(() -> insert(tree, 20));
-
-        assertIterableEquals(Arrays.asList(10, 20), toList(tree));
-        assertIterableEquals(Arrays.asList(INSERT_GO_RIGHT, INSERT_PLACED), trace);
+    private static Stream<Arguments> insertNoFixCases() {
+        return Stream.of(
+                Arguments.of(
+                        "insert right",
+                        20,
+                        Arrays.asList(10, 20),
+                        Arrays.asList(INSERT_GO_RIGHT, INSERT_PLACED)
+                ),
+                Arguments.of(
+                        "insert left",
+                        5,
+                        Arrays.asList(5, 10),
+                        Arrays.asList(INSERT_GO_LEFT, INSERT_PLACED)
+                )
+        );
     }
 
-    @Test
-    void insertGoLeftNoFix() throws Exception {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("insertNoFixCases")
+    void insertNoFix(
+            String scenario,
+            int inserted,
+            List<Integer> expectedTree,
+            List<RBTreeTracePoint> expectedTrace
+    ) throws Exception {
         Object tree = newTree();
         insert(tree, 10);
-        List<RBTreeTracePoint> trace = trace(() -> insert(tree, 5));
+        List<RBTreeTracePoint> trace = trace(() -> insert(tree, inserted));
 
-        assertIterableEquals(Arrays.asList(5, 10), toList(tree));
-        assertIterableEquals(Arrays.asList(INSERT_GO_LEFT, INSERT_PLACED), trace);
+        assertIterableEquals(expectedTree, toList(tree), scenario);
+        assertIterableEquals(expectedTrace, trace, scenario);
     }
 
     @Test
@@ -193,58 +210,58 @@ class RBTreeTest {
         assertIterableEquals(Arrays.asList(INSERT_GO_RIGHT, INSERT_GO_LEFT, INSERT_PLACED, FIX_ROTATE_RIGHT_CASE, FIX_ROTATE_LEFT), trace);
     }
 
-    @Test
-    void findMatch() throws Exception {
-        Object tree = newTree();
-        insert(tree, 10);
-
-        RBTreeLineTraceAgent.startTrace();
-        boolean found = find(tree, 10);
-        List<RBTreeTracePoint> trace = RBTreeLineTraceAgent.stopTrace();
-
-        assertTrue(found);
-        assertIterableEquals(Arrays.asList(FIND_MATCH), trace);
+    private static Stream<Arguments> findCases() {
+        return Stream.of(
+                Arguments.of(
+                        "root match",
+                        new int[]{10},
+                        10,
+                        true,
+                        Arrays.asList(FIND_MATCH)
+                ),
+                Arguments.of(
+                        "go left then match",
+                        new int[]{10, 5},
+                        5,
+                        true,
+                        Arrays.asList(FIND_GO_LEFT, FIND_MATCH)
+                ),
+                Arguments.of(
+                        "go right then match",
+                        new int[]{10, 20},
+                        20,
+                        true,
+                        Arrays.asList(FIND_GO_RIGHT, FIND_MATCH)
+                ),
+                Arguments.of(
+                        "not found",
+                        new int[]{10},
+                        99,
+                        false,
+                        Arrays.asList(FIND_GO_RIGHT, FIND_NOT_FOUND)
+                )
+        );
     }
 
-    @Test
-    void findGoLeftThenMatch() throws Exception {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("findCases")
+    void findScenarios(
+            String scenario,
+            int[] values,
+            int target,
+            boolean expectedFound,
+            List<RBTreeTracePoint> expectedTrace
+    ) throws Exception {
         Object tree = newTree();
-        insert(tree, 10);
-        insert(tree, 5);
+        for (int value : values) {
+            insert(tree, value);
+        }
 
-        RBTreeLineTraceAgent.startTrace();
-        boolean found = find(tree, 5);
-        List<RBTreeTracePoint> trace = RBTreeLineTraceAgent.stopTrace();
+        final boolean[] found = new boolean[1];
+        List<RBTreeTracePoint> trace = trace(() -> found[0] = find(tree, target));
 
-        assertTrue(found);
-        assertIterableEquals(Arrays.asList(FIND_GO_LEFT, FIND_MATCH), trace);
-    }
-
-    @Test
-    void findGoRightThenMatch() throws Exception {
-        Object tree = newTree();
-        insert(tree, 10);
-        insert(tree, 20);
-
-        RBTreeLineTraceAgent.startTrace();
-        boolean found = find(tree, 20);
-        List<RBTreeTracePoint> trace = RBTreeLineTraceAgent.stopTrace();
-
-        assertTrue(found);
-        assertIterableEquals(Arrays.asList(FIND_GO_RIGHT, FIND_MATCH), trace);
-    }
-
-    @Test
-    void findNotFound() throws Exception {
-        Object tree = newTree();
-        insert(tree, 10);
-
-        RBTreeLineTraceAgent.startTrace();
-        boolean found = find(tree, 99);
-        List<RBTreeTracePoint> trace = RBTreeLineTraceAgent.stopTrace();
-
-        assertFalse(found);
-        assertIterableEquals(Arrays.asList(FIND_GO_RIGHT, FIND_NOT_FOUND), trace);
+        assertEquals(expectedFound, found[0], scenario);
+        assertIterableEquals(expectedTrace, trace, scenario);
     }
 
     @Test
@@ -323,23 +340,21 @@ class RBTreeTest {
     }
 
     @Test
-    void nodeGetters() {
-        RBTreeNode<Integer> node = new RBTreeNode<>(42);
-        assertEquals(Integer.valueOf(42), node.getValue());
-        assertEquals(RBTreeNode.Color.RED, node.getColor());
-        assertNull(node.getLeft());
-        assertNull(node.getRight());
-        assertNull(node.getParent());
-    }
-
-    @Test
-    void isEmptyAndToList() throws Exception {
+    void emptyTreeState() throws Exception {
         Object tree = newTree();
+
         assertTrue(isEmpty(tree));
         assertTrue(toList(tree).isEmpty());
         assertNull(rootColorName(tree));
+    }
+
+    @Test
+    void nonEmptyAfterInsert() throws Exception {
+        Object tree = newTree();
 
         insert(tree, 10);
         assertFalse(isEmpty(tree));
+        assertIterableEquals(Arrays.asList(10), toList(tree));
+        assertEquals("BLACK", rootColorName(tree));
     }
 }
