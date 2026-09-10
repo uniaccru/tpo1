@@ -37,4 +37,5 @@ application {
 
 tasks.withType<Test> {
     useJUnitPlatform() // <--- Это ключевая строчка
+    //jvmArgs("-Djdk.attach.allowAttachSelf=true")
 }

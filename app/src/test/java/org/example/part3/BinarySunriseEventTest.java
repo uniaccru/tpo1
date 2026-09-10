@@ -26,6 +26,7 @@ class BinarySunriseEventTest {
 
     @Test
     void testInitialState() {
+        // Начальное состояние.
         assertEquals(BinarySunriseEvent.IlluminationState.TOTAL_DARKNESS, event.getIlluminationState());
         assertEquals(BinarySunriseEvent.HorizonState.PITCH_BLACK, event.getHorizonState());
         assertEquals(BinarySunriseEvent.AtmosphereState.RAREFIED, event.getAtmosphereState());
@@ -33,6 +34,7 @@ class BinarySunriseEventTest {
 
     @Test
     void flashPointOfLightUpdatesOnlyIllumination() {
+        // Переход в яркую точку.
         event.flashPointOfLight();
 
         assertEquals(BinarySunriseEvent.IlluminationState.BRIGHT_POINT, event.getIlluminationState());
@@ -42,6 +44,7 @@ class BinarySunriseEventTest {
 
     @Test
     void expandIntoCrescentUpdatesOnlyIllumination() {
+        // Переход в полумесяц.
         event.flashPointOfLight();
         event.expandIntoCrescent();
 
@@ -52,6 +55,7 @@ class BinarySunriseEventTest {
 
     @Test
     void revealSunsUpdatesAllVisualStates() {
+        // Появление двух солнц.
         event.flashPointOfLight();
         event.expandIntoCrescent();
         event.revealSuns();
@@ -62,6 +66,7 @@ class BinarySunriseEventTest {
     }
 
     private static Stream<Arguments> invalidTransitionCases() {
+        // Невалидные переходы.
         return Stream.of(
                 Arguments.of(
                         "flashPoint повторно",
@@ -109,6 +114,7 @@ class BinarySunriseEventTest {
             EventAction action,
             String expectedMessage
     ) {
+        // Ожидаем ошибку перехода.
         arrange.apply(event);
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> action.apply(event));
         assertEquals(expectedMessage, exception.getMessage(), scenario);

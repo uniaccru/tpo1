@@ -34,9 +34,7 @@ public class BinarySunriseEvent {
         }
     }
 
-    /**
-     * "В полной темноте сверкнула ослепительно яркая точка света."
-     */
+    // "В полной темноте сверкнула ослепительно яркая точка света."
     public void flashPointOfLight() {
         requireIlluminationState(
                 IlluminationState.TOTAL_DARKNESS,
@@ -45,9 +43,7 @@ public class BinarySunriseEvent {
         this.illuminationState = IlluminationState.BRIGHT_POINT;
     }
 
-    /**
-     * "Она начала расползаться в стороны, превращаясь в узкий полумесяц..."
-     */
+    // "Она начала расползаться в стороны, превращаясь в узкий полумесяц..."
     public void expandIntoCrescent() {
         requireIlluminationState(
                 IlluminationState.BRIGHT_POINT,
@@ -56,11 +52,9 @@ public class BinarySunriseEvent {
         this.illuminationState = IlluminationState.NARROW_CRESCENT;
     }
 
-    /**
-     * "...через несколько секунд показались два солнца: огненные светила,
-     * сжигающие белым пламенем черный край горизонта. Яркие цветные сполохи
-     * струились сквозь разреженную атмосферу."
-     */
+    // "...показались два солнца: огненные светила,
+    // сжигающие белым пламенем черный край горизонта. Яркие цветные сполохи
+    // струились сквозь разреженную атмосферу."
     public void revealSuns() {
         requireIlluminationState(
                 IlluminationState.NARROW_CRESCENT,
@@ -71,7 +65,6 @@ public class BinarySunriseEvent {
         this.atmosphereState = AtmosphereState.COLORFUL_FLASHES;
     }
 
-    // --- Getters ---
 
     public IlluminationState getIlluminationState() {
         return illuminationState;

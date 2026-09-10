@@ -3,7 +3,7 @@ package org.example.part2;
 public class RBTreeNode<T extends Comparable<T>> {
     public enum Color { RED, BLACK }
 
-    T value;
+    public T value;
     Color color;
     RBTreeNode<T> left;
     RBTreeNode<T> right;
