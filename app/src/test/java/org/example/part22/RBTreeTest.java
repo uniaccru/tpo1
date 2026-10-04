@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Характерные точки:
  * ТЧ1 — вставка в пустое дерево (корень становится BLACK)
+ * 
  * ТЧ2 — fixAfterInsert: дядя RED → перекрашивание (случай 1)
  * ТЧ3 — fixAfterInsert: линия → одинарный поворот (случай 3)
  * ТЧ4 — fixAfterInsert: треугольник → двойной поворот (случай 2+3)
