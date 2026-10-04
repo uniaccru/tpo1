@@ -5,11 +5,8 @@ import java.util.List;
 
 public class RBTree<T extends Comparable<T>> {
 
-    // =====================================================================
-    // ПОЛЯ
-    // =====================================================================
     private RBTreeNode<T> root;
-    private final RBTreeNode<T> NIL; // sentinel-узел (пустой лист, всегда чёрный)
+    private final RBTreeNode<T> NIL;
 
     public RBTree() {
         NIL = new RBTreeNode<>(null);
@@ -20,9 +17,6 @@ public class RBTree<T extends Comparable<T>> {
         root = NIL;
     }
 
-    // =====================================================================
-    // INSERT
-    // =====================================================================
     public void insert(T value) {
         RBTreeNode<T> node = new RBTreeNode<>(value);
         node.left = NIL;
@@ -35,7 +29,6 @@ public class RBTree<T extends Comparable<T>> {
             return;
         }
 
-        // Обычная вставка как в BST
         RBTreeNode<T> current = root;
         RBTreeNode<T> parent = NIL;
 
@@ -58,34 +51,26 @@ public class RBTree<T extends Comparable<T>> {
         fixAfterInsert(node);
     }
 
-    // =====================================================================
-    // БАЛАНСИРОВКА ПОСЛЕ ВСТАВКИ
-    // =====================================================================
     private void fixAfterInsert(RBTreeNode<T> node) {
         while (node.parent.color == RBTreeNode.Color.RED) {
             if (node.parent == node.parent.parent.left) {
-                // Родитель — левый ребёнок деда
                 RBTreeNode<T> uncle = node.parent.parent.right;
 
                 if (uncle.color == RBTreeNode.Color.RED) {
-                    // Случай 1: дядя красный — перекрашиваем
                     node.parent.color = RBTreeNode.Color.BLACK;
                     uncle.color = RBTreeNode.Color.BLACK;
                     node.parent.parent.color = RBTreeNode.Color.RED;
                     node = node.parent.parent;
                 } else {
                     if (node == node.parent.right) {
-                        // Случай 2: узел — правый ребёнок (треугольник) → поворот влево
                         node = node.parent;
                         rotateLeft(node);
                     }
-                    // Случай 3: поворот вправо
                     node.parent.color = RBTreeNode.Color.BLACK;
                     node.parent.parent.color = RBTreeNode.Color.RED;
                     rotateRight(node.parent.parent);
                 }
             } else {
-                // Зеркальный случай: родитель — правый ребёнок деда
                 RBTreeNode<T> uncle = node.parent.parent.left;
 
                 if (uncle.color == RBTreeNode.Color.RED) {
@@ -95,11 +80,9 @@ public class RBTree<T extends Comparable<T>> {
                     node = node.parent.parent;
                 } else {
                     if (node == node.parent.left) {
-                        // Случай 2 зеркальный: треугольник → поворот вправо
                         node = node.parent;
                         rotateRight(node);
                     }
-                    // Случай 3 зеркальный: поворот влево
                     node.parent.color = RBTreeNode.Color.BLACK;
                     node.parent.parent.color = RBTreeNode.Color.RED;
                     rotateLeft(node.parent.parent);
@@ -109,9 +92,6 @@ public class RBTree<T extends Comparable<T>> {
         root.color = RBTreeNode.Color.BLACK;
     }
 
-    // =====================================================================
-    // FIND
-    // =====================================================================
     public boolean find(T value) {
         RBTreeNode<T> current = root;
         while (current != NIL) {
@@ -127,9 +107,6 @@ public class RBTree<T extends Comparable<T>> {
         return false;
     }
 
-    // =====================================================================
-    // DELETE
-    // =====================================================================
     public void delete(T value) {
         RBTreeNode<T> node = findNode(value);
         if (node == NIL) {
@@ -150,7 +127,6 @@ public class RBTree<T extends Comparable<T>> {
             child = node.left;
             transplant(node, node.left);
         } else {
-            // Два ребёнка — ищем минимум в правом поддереве (преемника)
             toDelete = minimum(node.right);
             originalColor = toDelete.color;
             child = toDelete.right;
@@ -172,16 +148,12 @@ public class RBTree<T extends Comparable<T>> {
         }
     }
 
-    // =====================================================================
-    // БАЛАНСИРОВКА ПОСЛЕ УДАЛЕНИЯ
-    // =====================================================================
     private void fixAfterDelete(RBTreeNode<T> node) {
         while (node != root && node.color == RBTreeNode.Color.BLACK) {
             if (node == node.parent.left) {
                 RBTreeNode<T> sibling = node.parent.right;
 
                 if (sibling.color == RBTreeNode.Color.RED) {
-                    // Случай 1: брат красный
                     sibling.color = RBTreeNode.Color.BLACK;
                     node.parent.color = RBTreeNode.Color.RED;
                     rotateLeft(node.parent);
@@ -190,18 +162,15 @@ public class RBTree<T extends Comparable<T>> {
 
                 if (sibling.left.color == RBTreeNode.Color.BLACK &&
                         sibling.right.color == RBTreeNode.Color.BLACK) {
-                    // Случай 2: оба ребёнка брата чёрные
                     sibling.color = RBTreeNode.Color.RED;
                     node = node.parent;
                 } else {
                     if (sibling.right.color == RBTreeNode.Color.BLACK) {
-                        // Случай 3: правый ребёнок брата чёрный
                         sibling.left.color = RBTreeNode.Color.BLACK;
                         sibling.color = RBTreeNode.Color.RED;
                         rotateRight(sibling);
                         sibling = node.parent.right;
                     }
-                    // Случай 4: правый ребёнок брата красный
                     sibling.color = node.parent.color;
                     node.parent.color = RBTreeNode.Color.BLACK;
                     sibling.right.color = RBTreeNode.Color.BLACK;
@@ -209,7 +178,6 @@ public class RBTree<T extends Comparable<T>> {
                     node = root;
                 }
             } else {
-                // Зеркальный случай
                 RBTreeNode<T> sibling = node.parent.left;
 
                 if (sibling.color == RBTreeNode.Color.RED) {
@@ -241,9 +209,6 @@ public class RBTree<T extends Comparable<T>> {
         node.color = RBTreeNode.Color.BLACK;
     }
 
-    // =====================================================================
-    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // =====================================================================
     private void rotateLeft(RBTreeNode<T> x) {
         RBTreeNode<T> y = x.right;
         x.right = y.left;
@@ -290,9 +255,6 @@ public class RBTree<T extends Comparable<T>> {
         return node;
     }
 
-    // =====================================================================
-    // УТИЛИТЫ
-    // =====================================================================
     public List<T> toList() {
         List<T> result = new ArrayList<>();
         inorder(root, result);
@@ -310,7 +272,6 @@ public class RBTree<T extends Comparable<T>> {
         return root == NIL;
     }
 
-    // Получить цвет корня (для тестов)
     public RBTreeNode.Color getRootColor() {
         if (root == NIL) return null;
         return root.color;

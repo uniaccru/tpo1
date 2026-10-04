@@ -114,7 +114,6 @@ class BinarySunriseEventTest {
             EventAction action,
             String expectedMessage
     ) {
-        // Ожидаем ошибку перехода.
         arrange.apply(event);
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> action.apply(event));
         assertEquals(expectedMessage, exception.getMessage(), scenario);

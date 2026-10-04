@@ -12,6 +12,9 @@ public class SinPowerSeries {
 
     public double sin(double x, int n) {
 
+        if (n < 0) 
+            throw new IllegalArgumentException("n must be >= 0");
+
         double res = 0;
 
         //sin(X) = sum {k=0}-{n} [ (-1)^k * x^(2k+1) / (2k+1)! ]

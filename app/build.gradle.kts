@@ -19,6 +19,7 @@ dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("net.bytebuddy:byte-buddy:1.14.19")
     testImplementation("net.bytebuddy:byte-buddy-agent:1.14.19")
 }
