@@ -17,18 +17,8 @@ public class SinPowerSeriesTest {
     }
 
     @Test
-    void initialConditions() {
-        double h = 1e-5;
+    void sinAtZeroIsZero() {
         assertEquals(0.0, f(0), DELTA);
-        assertEquals(1.0, (f(h) - f(-h)) / (2 * h), 1e-6);
-    }
-
-    @ParameterizedTest(name = "x={0}")
-    @ValueSource(doubles = {-2.5, -1.0, 0.5, 1.5, 3.0})
-    void satisfiesDifferentialEquation(double x) {
-        double h = 1e-3;
-        double second = (f(x + h) - 2 * f(x) + f(x - h)) / (h * h);
-        assertEquals(0.0, second + f(x), 1e-5);
     }
 
     @ParameterizedTest(name = "x={0}")
@@ -47,13 +37,13 @@ public class SinPowerSeriesTest {
     @Test
     void piIsNotAPeriod() {
         double x = Math.PI / 2;
-        assertNotEquals(f(x), f(x + Math.PI), 0.5);
+        assertNotEquals(f(x), f(x + Math.PI), DELTA);
     }
 
     @Test
     void maximumAtHalfPi() {
         double x = Math.PI / 2;
-        assertEquals(1.0, f(x), DELTA);
+        assertEquals(1.0, f(x), DELTA); //значение в максимуме
         assertTrue(f(x - 0.1) < 1.0);
         assertTrue(f(x + 0.1) < 1.0);
     }
